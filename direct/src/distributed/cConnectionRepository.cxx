@@ -305,8 +305,8 @@ check_datagram() {
 
     switch (_msg_type) {
 #ifdef HAVE_PYTHON
-    case CLIENT_OBJECT_SET_FIELD:
-    case STATESERVER_OBJECT_SET_FIELD:
+    case CLIENT_OBJECT_UPDATE_FIELD:
+    case STATESERVER_OBJECT_UPDATE_FIELD:
       if (_handle_c_updates) {
         if (_has_owner_view) {
           if (!handle_update_field_owner()) {
@@ -323,7 +323,7 @@ check_datagram() {
       }
       break;
 #endif  // HAVE_PYTHON
-
+      
     default:
       // Some unknown message; let the caller deal with it.
       return true;
@@ -899,12 +899,13 @@ describe_message(std::ostream &out, const string &prefix,
 
     packer.RAW_UNPACK_CHANNEL();  // msg_sender
     msg_type = packer.raw_unpack_uint16();
-    is_update = (msg_type == STATESERVER_OBJECT_SET_FIELD);
+    
+    is_update = (msg_type == STATESERVER_OBJECT_UPDATE_FIELD);
 
   } else {
     msg_type = packer.raw_unpack_uint16();
-    is_update = (msg_type == CLIENT_OBJECT_SET_FIELD);
-  }
+    is_update = (msg_type == CLIENT_OBJECT_UPDATE_FIELD);
+    }
 
   if (!is_update) {
     // figure out the name of the message TODO: print out the arguments to the

@@ -179,9 +179,15 @@ receive_update_broadcast_required_owner(PyObject *distobj,
   for (int i = 0; i < num_fields && !PyErr_Occurred(); ++i) {
     DCField *field = _this->get_inherited_field(i);
     if (field->as_molecular_field() == nullptr &&
-        field->is_required() && (field->is_ownrecv() || field->is_broadcast())) {
+        field->is_required()) {
       packer.begin_unpack(field);
-      invoke_extension(field).receive_update(packer, distobj);
+      if (field->is_ownrecv()) {
+        invoke_extension(field).receive_update(packer, distobj);
+      } else {
+        // It's not an ownrecv field; skip over it.  It's difficult to filter
+        // this on the server, ask Roger for the reason.
+        packer.unpack_skip();
+      }
       if (!packer.end_unpack()) {
         break;
       }
@@ -580,19 +586,19 @@ ai_format_generate(PyObject *distobj, DOID_TYPE do_id,
   packer.raw_pack_uint8(1);
   packer.RAW_PACK_CHANNEL(district_channel_id);
   packer.RAW_PACK_CHANNEL(from_channel_id);
-    // packer.raw_pack_uint8('A');
+  // packer.raw_pack_uint8('A');
 
   bool has_optional_fields = (PyObject_IsTrue(optional_fields) != 0);
 
   if (has_optional_fields) {
-    packer.raw_pack_uint16(STATESERVER_CREATE_OBJECT_WITH_REQUIRED_OTHER);
+    packer.raw_pack_uint16(STATESERVER_OBJECT_GENERATE_WITH_REQUIRED_OTHER);
   } else {
-    packer.raw_pack_uint16(STATESERVER_CREATE_OBJECT_WITH_REQUIRED);
+    packer.raw_pack_uint16(STATESERVER_OBJECT_GENERATE_WITH_REQUIRED);
   }
 
-  packer.raw_pack_uint32(do_id);
   // Parent is a bit overloaded; this parent is not about inheritance, this
   // one is about the visibility container parent, i.e.  the zone parent:
+  packer.raw_pack_uint32(do_id);
   packer.raw_pack_uint32(parent_id);
   packer.raw_pack_uint32(zone_id);
   packer.raw_pack_uint16(_this->_number);

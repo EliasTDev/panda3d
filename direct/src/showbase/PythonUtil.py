@@ -3532,6 +3532,8 @@ def clampScalar(value, a, b):
         else:
             return value
 
+def cmp(a, b):
+    return (a > b) - (a < b)
 #set up bpdb
 bpdb = BpDb.BpDb()
 def bpdbGetEnabled():
@@ -3602,5 +3604,6 @@ builtins.DestructiveScratchPad = DestructiveScratchPad
 builtins.clampScalar = clampScalar
 builtins.isClient = isClient
 builtins.triglerp = triglerp
+builtins.cmp = cmp
 builtins.bpdb = bpdb
 builtins.describeException = describeException

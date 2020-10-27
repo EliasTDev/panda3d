@@ -139,7 +139,6 @@ class EXPCL_DNA DNAStorage
         void r_discover_connections(PT(DNASuitPoint) point, graph_id_t id);
         bool discover_continuity();
 
-        void write_pdna(Datagram& dg);
         void write_dna(std::ostream& out);
 
 #ifndef CPPPARSER
