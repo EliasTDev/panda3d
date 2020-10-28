@@ -1017,6 +1017,11 @@ class ShowBase(DirectObject.DirectObject):
             self.__doStartDirect()
 
         return self.win is not None
+        
+    def isMainWindowOpen(self):
+        if self.win != None:
+            return self.win.isValid()
+        return 0
 
     def openMainWindow(self, *args, **kw):
         """
